@@ -22,9 +22,10 @@ This project performs an exploratory data analysis (EDA) on a sample sales datas
     ```
 2.  **Download Data**:
     Ensure `sales_data.csv` is present in the directory.
-3.  **Run Analysis**:
+3.  **Run the Dashboard**:
+    Start the interactive Streamlit application:
     ```bash
-    python analysis.py
+    streamlit run app.py
     ```
-    This will generate the `sales_dashboard.png` file.
+    This will open the dashboard in your default web browser (usually at `http://localhost:8501`).
 # salesdata-analysis
