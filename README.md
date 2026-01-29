@@ -1,8 +1,6 @@
-# 📊 Sales Data Analysis Dashboard
+# 🎬 Movie Analytics Dashboard
 
-An interactive Data Science application to analyze and forecast sales performance. Built with **Python**, **Streamlit**, and **Plotly**.
-
-![Sales Dashboard](sales_dashboard.png)
+An interactive Data Science application to analyze trends in the IMDB 5000 movie dataset. Built with **Python**, **Streamlit**, and **Plotly**.
 
 ## 📋 Table of Contents
 - [Overview](#overview)
@@ -14,39 +12,33 @@ An interactive Data Science application to analyze and forecast sales performanc
 - [Educational Purpose](#educational-purpose)
 
 ## 📖 Overview
-This project transforms raw sales data into actionable insights. It serves as a comprehensive example of a modern data science workflow, moving from data cleaning and exploratory analysis to interactive visualization and machine learning-based forecasting.
+This project transforms raw IMDB movie metadata into actionable insights. It serves as a comprehensive example of a modern data science workflow, moving from data cleaning and exploratory analysis to interactive visualization.
 
 ## ✨ Key Features
 
 ### 1. Interactive Dashboard
--   **Dynamic Filtering**: Filter data by Year, Country, and Product Category.
--   **Real-time KPIs**: View Total Revenue, Profit, Order Count, and Average Unit Price instantly.
+-   **Dynamic Filtering**: Filter data by Release Year, Genre, and Director.
+-   **Real-time KPIs**: View Total Movies, Total Box Office, Avg IMDB Score, and Avg Budget.
 -   **Interactive Charts**: Zoom, pan, and hover over charts for detailed data points.
 
 ### 2. Advanced Analytics
--   **Revenue Analysis**: Breakdown of revenue by Category and Country.
--   **Profitability Analysis**: Identification of the top 10 most profitable sub-categories.
--   **Seasonal Trends**: Analysis of monthly sales trends across different years to identify seasonality.
-
-### 3. Sales Forecasting
--   **Time Series Modeling**: Uses **Exponential Smoothing (Holt-Winters)** to predict future sales.
--   **Visual Forecast**: Overlays historical data with 6-month sales predictions.
+-   **Director Analysis**: Top 10 highest-grossing directors.
+-   **Genre Trends**: Average Imdb scores by genre.
+-   **Financial Analysis**: Budget vs. Gross Revenue correlation (log scale).
+-   **Temporal Trends**: Number of movies released per year.
 
 ## 📂 Project Structure
 The project follows a modular architecture for scalability and maintainability.
 
 ```text
-sales-analysis/
+movie-analytics/
 ├── app.py                  # Main entry point for the Streamlit dashboard
-├── analysis.py             # (Legacy) Standalone script for static analysis
 ├── requirements.txt        # Project dependencies
-├── sales_data.csv          # Dataset file
-├── sales_dashboard.png     # Static dashboard export
+├── movie_metadata.csv      # Dataset file (IMDB 5000)
 ├── src/                    # Source code package
 │   ├── __init__.py
 │   ├── loader.py           # Data loading and preprocessing logic
-│   ├── analysis.py         # Statistical analysis and transformation functions
-│   └── forecasting.py      # Machine Learning forecasting module
+│   └── analysis.py         # Statistical analysis and transformation functions
 └── README.md               # Project documentation
 ```
 
@@ -77,7 +69,7 @@ pip install -r requirements.txt
 ```
 
 ### Step 4: Download Data
-Ensure the `sales_data.csv` file is present in the root directory. If not, it will be downloaded automatically by the legacy script or needs to be placed manually.
+Ensure the `movie_metadata.csv` file is present in the root directory.
 
 ## 🚀 Usage
 
@@ -88,18 +80,12 @@ streamlit run app.py
 ```
 This will open the dashboard in your default web browser (usually at `http://localhost:8501`).
 
-### Run Static Analysis
-To generate a static PNG report (legacy mode):
-```bash
-python analysis.py
-```
-
 ## 🛠️ Technologies
 -   **Language**: Python 3.13
 -   **Web Framework**: Streamlit
 -   **Data Manipulation**: Pandas
--   **Visualization**: Plotly, Matplotlib
--   **Forecasting**: statsmodels
+-   **Visualization**: Plotly
+-   **Source Data**: IMDB 5000 Movie Dataset
 
 ## 🎓 Educational Purpose
 > [!IMPORTANT]
@@ -107,5 +93,5 @@ python analysis.py
 > It demonstrates:
 > *   Building modular Python applications.
 > *   Creating interactive data dashboards.
-> *   Implementing basic time-series forecasting.
+> *   Exploratory Data Analysis (EDA) on real-world datasets.
 > *   Structuring a data science project professionally.

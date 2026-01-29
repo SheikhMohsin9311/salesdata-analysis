@@ -1,33 +1,32 @@
 import pandas as pd
 
-def get_revenue_by_category(df):
-    """Calculates total revenue per product category."""
-    return df.groupby('Product_Category')['Revenue'].sum().sort_values(ascending=False)
+import pandas as pd
 
-def get_monthly_sales_pivot(df):
-    """Pivots data for monthly sales comparison by year."""
-    pivot = df.pivot_table(values='Revenue', index='Month_Name', columns='Year', aggfunc='sum')
-    month_order = ['January', 'February', 'March', 'April', 'May', 'June', 
-                   'July', 'August', 'September', 'October', 'November', 'December']
-    return pivot.reindex(month_order)
+def get_top_grossing_directors(df, n=10):
+    """Returns top N directors by total gross revenue."""
+    return df.groupby('director_name')['gross'].sum().sort_values(ascending=False).head(n)
 
-def get_top_profitable_subcategories(df, n=10):
-    """Returns top N most profitable sub-categories."""
-    return df.groupby('Sub_Category')['Profit'].sum().sort_values(ascending=True).tail(n)
+def get_avg_imdb_by_genre(df):
+    """Calculates average IMDB score per primary genre."""
+    return df.groupby('primary_genre')['imdb_score'].mean().sort_values(ascending=False)
 
-def get_revenue_by_country(df):
-    """Calculates revenue distribution by country."""
-    return df.groupby('Country')['Revenue'].sum().sort_values(ascending=False)
+def get_movies_per_year(df):
+    """Counts number of movies released per year."""
+    return df.groupby('title_year').size().sort_index()
 
-def get_filtered_data(df, year=None, country=None, category=None):
+def get_top_grossing_movies(df, n=10):
+    """Returns top N movies by gross revenue."""
+    return df[['movie_title', 'gross']].sort_values(by='gross', ascending=False).head(n)
+
+def get_filtered_data(df, year=None, director=None, genre=None):
     """
     Filters dataframe based on optional parameters.
     """
     filtered_df = df.copy()
     if year:
-        filtered_df = filtered_df[filtered_df['Year'] == year]
-    if country:
-        filtered_df = filtered_df[filtered_df['Country'] == country]
-    if category:
-        filtered_df = filtered_df[filtered_df['Product_Category'] == category]
+        filtered_df = filtered_df[filtered_df['title_year'] == year]
+    if director:
+        filtered_df = filtered_df[filtered_df['director_name'] == director]
+    if genre:
+        filtered_df = filtered_df[filtered_df['primary_genre'] == genre]
     return filtered_df

@@ -2,13 +2,14 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 import plotly.graph_objects as go
-from src import loader, analysis, forecasting
+from src import loader, analysis
 
 # Page Config
-st.set_page_config(page_title="Sales Dashboard", layout="wide", page_icon="📊")
+st.set_page_config(page_title="Movie Analytics Dashboard", layout="wide", page_icon="🎬")
 
 # Title
-st.title("📊 Interactive Sales Performance Dashboard")
+st.title("🎬 Movie Analytics Dashboard")
+st.markdown("Explore trends in the IMDB 5000 movie dataset.")
 
 # Load Data
 @st.cache_data
@@ -22,35 +23,35 @@ if df is not None:
     st.sidebar.header("Filters")
     
     # Filter by Year
-    years = sorted(df['Year'].unique())
-    selected_year = st.sidebar.selectbox("Select Year", ["All"] + years)
+    years = sorted(df['title_year'].unique(), reverse=True)
+    selected_year = st.sidebar.selectbox("Select Release Year", ["All"] + list(years))
     
-    # Filter by Country
-    countries = sorted(df['Country'].unique())
-    selected_country = st.sidebar.multiselect("Select Country", countries, default=countries)
+    # Filter by Genre
+    genres = sorted(df['primary_genre'].unique())
+    selected_genre = st.sidebar.multiselect("Select Genre", genres)
     
-    # Filter by Category
-    categories = sorted(df['Product_Category'].unique())
-    selected_category = st.sidebar.multiselect("Select Category", categories, default=categories)
+    # Filter by Director
+    directors = sorted(df['director_name'].dropna().unique())
+    selected_director = st.sidebar.multiselect("Select Director", directors)
     
     # Apply Filters
     filtered_df = df.copy()
     if selected_year != "All":
-        filtered_df = filtered_df[filtered_df['Year'] == selected_year]
+        filtered_df = filtered_df[filtered_df['title_year'] == selected_year]
     
-    if selected_country:
-        filtered_df = filtered_df[filtered_df['Country'].isin(selected_country)]
+    if selected_genre:
+        filtered_df = filtered_df[filtered_df['primary_genre'].isin(selected_genre)]
         
-    if selected_category:
-        filtered_df = filtered_df[filtered_df['Product_Category'].isin(selected_category)]
+    if selected_director:
+        filtered_df = filtered_df[filtered_df['director_name'].isin(selected_director)]
         
     # KPIs
     st.markdown("### Key Metrics")
     col1, col2, col3, col4 = st.columns(4)
-    col1.metric("Total Revenue", f"${filtered_df['Revenue'].sum():,.0f}")
-    col2.metric("Total Profit", f"${filtered_df['Profit'].sum():,.0f}")
-    col3.metric("Total Orders", f"{filtered_df.shape[0]:,}")
-    col4.metric("Avg. Unit Price", f"${filtered_df['Unit_Price'].mean():,.2f}")
+    col1.metric("Total Movies", f"{filtered_df.shape[0]:,}")
+    col2.metric("Total Box Office", f"${filtered_df['gross'].sum():,.0f}")
+    col3.metric("Avg. IMDB Score", f"{filtered_df['imdb_score'].mean():.1f}")
+    col4.metric("Avg. Budget", f"${filtered_df['budget'].mean():,.0f}")
     
     st.divider()
 
@@ -58,93 +59,66 @@ if df is not None:
     col_left, col_right = st.columns(2)
     
     with col_left:
-        st.subheader("Revenue by Category")
-        rev_by_cat = analysis.get_revenue_by_category(filtered_df)
-        fig_cat = px.bar(
-            x=rev_by_cat.index, 
-            y=rev_by_cat.values, 
-            labels={'x': 'Category', 'y': 'Revenue'},
-            color=rev_by_cat.values,
-            color_continuous_scale='Blues'
-        )
-        st.plotly_chart(fig_cat, use_container_width=True)
-        
-        st.subheader("Top 10 Profitable Sub-Categories")
-        prof_sub = analysis.get_top_profitable_subcategories(filtered_df)
-        fig_prof = px.bar(
-            x=prof_sub.values,
-            y=prof_sub.index,
-            orientation='h',
-            labels={'x': 'Profit', 'y': 'Sub-Category'},
-            color=prof_sub.values,
-            color_continuous_scale='Greens'
-        )
-        st.plotly_chart(fig_prof, use_container_width=True)
-
-    with col_right:
-        st.subheader("Sales Trend (Monthly)")
-        # For trend, we want to see the filtered trend
-        monthly_sales = filtered_df.groupby(['Year', 'Month', 'Month_Name'])['Revenue'].sum().reset_index()
-        # Sort by year and month
-        monthly_sales = monthly_sales.sort_values(['Year', 'Month'])
-        # Create a 'Date' column for plotting
-        monthly_sales['Date'] = pd.to_datetime(monthly_sales[['Year', 'Month']].assign(Day=1))
-        
+        st.subheader("Top 10 Highest Grossing Directors")
+        top_directors = analysis.get_top_grossing_directors(filtered_df)
+        if not top_directors.empty:
+            fig_dir = px.bar(
+                x=top_directors.values, 
+                y=top_directors.index, 
+                orientation='h',
+                labels={'x': 'Total Gross', 'y': 'Director'},
+                color=top_directors.values,
+                color_continuous_scale='Magma'
+            )
+            st.plotly_chart(fig_dir, use_container_width=True)
+        else:
+            st.info("No data for directors.")
+            
+        st.subheader("Movies Released per Year")
+        # Global trend (unfiltered by year to show context, unless year is selected)
+        trend_df = analysis.get_movies_per_year(df if selected_year == "All" else filtered_df)
         fig_trend = px.line(
-            monthly_sales, 
-            x='Date', 
-            y='Revenue',
+            x=trend_df.index, 
+            y=trend_df.values,
+            labels={'x': 'Year', 'y': 'Number of Movies'},
             markers=True
         )
         st.plotly_chart(fig_trend, use_container_width=True)
-        
-        st.subheader("Revenue by Country")
-        rev_country = analysis.get_revenue_by_country(filtered_df)
-        fig_country = px.pie(
-            values=rev_country.values,
-            names=rev_country.index,
-            hole=0.4
+
+    with col_right:
+        st.subheader("Average IMDB Score by Genre")
+        avg_score = analysis.get_avg_imdb_by_genre(filtered_df)
+        if not avg_score.empty:
+            fig_genre = px.bar(
+                x=avg_score.index, 
+                y=avg_score.values,
+                labels={'x': 'Genre', 'y': 'Avg IMDB Score'},
+                color=avg_score.values,
+                color_continuous_scale='Viridis'
+            )
+            fig_genre.update_yaxes(range=[0, 10])
+            st.plotly_chart(fig_genre, use_container_width=True)
+        else:
+            st.info("No data for genres.")
+
+        st.subheader("Budget vs. Gross Revenue")
+        # Scatter plot
+        fig_scatter = px.scatter(
+            filtered_df,
+            x='budget',
+            y='gross',
+            color='primary_genre',
+            hover_data=['movie_title', 'director_name', 'title_year'],
+            log_x=True, log_y=True, # Log scale handles the huge range differences in movie money
+            labels={'budget': 'Budget (Log)', 'gross': 'Gross Revenue (Log)'}
         )
-        st.plotly_chart(fig_country, use_container_width=True)
+        st.plotly_chart(fig_scatter, use_container_width=True)
 
     st.divider()
     
-    # Forecasting Section
-    st.subheader("🔮 Sales Forecast (Next 6 Months)")
-    st.markdown("Forecast is based on the **entire dataset** history (filters ignored to ensure data continuity).")
-    
-    if st.button("Generate Forecast"):
-        with st.spinner("Training model..."):
-            forecast_df, history = forecasting.forecast_sales(df, periods=6)
-            
-            if forecast_df is not None:
-                # Plotting History + Forecast
-                fig_forecast = go.Figure()
-                
-                # History
-                fig_forecast.add_trace(go.Scatter(
-                    x=history.index, 
-                    y=history.values, 
-                    mode='lines', 
-                    name='Historical Sales',
-                    line=dict(color='blue')
-                ))
-                
-                # Forecast
-                fig_forecast.add_trace(go.Scatter(
-                    x=forecast_df['Date'], 
-                    y=forecast_df['Forecast'], 
-                    mode='lines+markers', 
-                    name='Forecast',
-                    line=dict(color='orange', dash='dash')
-                ))
-                
-                fig_forecast.update_layout(title="Sales Forecast", xaxis_title="Date", yaxis_title="Revenue")
-                st.plotly_chart(fig_forecast, use_container_width=True)
-                
-                st.write("Predicted Values:", forecast_df.set_index('Date'))
-            else:
-                st.error("Not enough data to generate forecast or model failed.")
+    st.subheader("Top Grossing Movies Data")
+    top_movies = analysis.get_top_grossing_movies(filtered_df, n=20)
+    st.dataframe(top_movies.set_index('movie_title'), use_container_width=True)
 
 else:
-    st.error("Data could not be loaded. Please ensure 'sales_data.csv' is in the project directory.")
+    st.error("Data could not be loaded. Please ensure 'movie_metadata.csv' is in the project directory.")

@@ -1,5 +1,5 @@
 import pandas as pd
-from src import loader, analysis, forecasting
+from src import loader, analysis
 import sys
 
 def test_modules():
@@ -8,21 +8,22 @@ def test_modules():
     if df is None:
         print("FAIL: DataFrame is None")
         sys.exit(1)
-    print(f"PASS: Loaded {len(df)} records")
+    print(f"PASS: Loaded {len(df)} movie records")
 
     print("\nTesting analysis...")
-    rev_cat = analysis.get_revenue_by_category(df)
-    if rev_cat.empty:
-        print("FAIL: Revenue by category is empty")
+    # Test Director Analysis
+    top_dirs = analysis.get_top_grossing_directors(df)
+    if top_dirs.empty:
+        print("FAIL: Top directors is empty")
         sys.exit(1)
-    print("PASS: Revenue by category calculated")
+    print("PASS: Top directors calculated")
     
-    print("\nTesting forecasting...")
-    forecast, history = forecasting.forecast_sales(df, periods=3)
-    if forecast is None:
-        print("FAIL: Forecast failed")
+    # Test Genre Analysis
+    avg_genre = analysis.get_avg_imdb_by_genre(df)
+    if avg_genre.empty:
+        print("FAIL: Avg genre score is empty")
         sys.exit(1)
-    print(f"PASS: Forecast generated for {len(forecast)} periods")
+    print("PASS: Avg genre score calculated")
     
     print("\nAll modules passed basic checks.")
 
