@@ -1,0 +1,43 @@
+/* Main Background */
+.stApp {
+    background-color: #0E1117;
+    color: #FAFAFA;
+}
+
+/* Sidebar */
+section[data-testid="stSidebar"] {
+    background-color: #262730;
+    color: #FAFAFA;
+}
+
+/* Metrics Cards */
+div[data-testid="metric-container"] {
+    background-color: #262730;
+    border: 1px solid #4C4C4C;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
+    color: #FAFAFA;
+}
+
+div[data-testid="metric-container"] > label {
+    color: #A6A6A6; /* Label Color */
+    font-size: 1rem;
+}
+
+div[data-testid="metric-container"] > div[data-testid="stMetricValue"] {
+    color: #21C354; /* Value Color (Greenish) */
+    font-size: 2rem;
+}
+
+/* Headers */
+h1, h2, h3 {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    font-weight: 600;
+    color: #FAFAFA;
+}
+
+/* Plotly Charts Background */
+.js-plotly-plot .plotly .main-svg {
+    background: rgba(0,0,0,0) !important;
+}

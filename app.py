@@ -7,6 +7,10 @@ from src import loader, analysis
 # Page Config
 st.set_page_config(page_title="Movie Analytics Dashboard", layout="wide", page_icon="🎬")
 
+# Load Custom CSS
+with open('assets/style.css') as f:
+    st.markdown(f'<style>{f.read()}</style>', unsafe_allow_html=True)
+
 # Title
 st.title("🎬 Movie Analytics Dashboard")
 st.markdown("Explore trends in the IMDB 5000 movie dataset.")
@@ -55,10 +59,29 @@ if df is not None:
     
     st.divider()
 
-    # Layout: 2 Columns for Charts
-    col_left, col_right = st.columns(2)
-    
-    with col_left:
+    # Tabs for Layout
+    tab1, tab2, tab3 = st.tabs(["Overview", "Director Insights", "Genre Trends"])
+
+    with tab1:
+        st.subheader("Global Trends")
+        
+        # Movies Released per Year
+        trend_df = analysis.get_movies_per_year(df if selected_year == "All" else filtered_df)
+        fig_trend = px.line(
+            x=trend_df.index, 
+            y=trend_df.values,
+            labels={'x': 'Year', 'y': 'Number of Movies'},
+            markers=True,
+            template='plotly_dark'
+        )
+        fig_trend.update_layout(title_text='Movies Released per Year', title_x=0.5)
+        st.plotly_chart(fig_trend, use_container_width=True)
+
+        st.subheader("Top Grossing Movies Data")
+        top_movies = analysis.get_top_grossing_movies(filtered_df, n=20)
+        st.dataframe(top_movies.set_index('movie_title'), use_container_width=True)
+
+    with tab2:
         st.subheader("Top 10 Highest Grossing Directors")
         top_directors = analysis.get_top_grossing_directors(filtered_df)
         if not top_directors.empty:
@@ -68,57 +91,47 @@ if df is not None:
                 orientation='h',
                 labels={'x': 'Total Gross', 'y': 'Director'},
                 color=top_directors.values,
-                color_continuous_scale='Magma'
+                color_continuous_scale='Magma',
+                template='plotly_dark'
             )
+            fig_dir.update_layout(yaxis={'categoryorder':'total ascending'})
             st.plotly_chart(fig_dir, use_container_width=True)
         else:
             st.info("No data for directors.")
-            
-        st.subheader("Movies Released per Year")
-        # Global trend (unfiltered by year to show context, unless year is selected)
-        trend_df = analysis.get_movies_per_year(df if selected_year == "All" else filtered_df)
-        fig_trend = px.line(
-            x=trend_df.index, 
-            y=trend_df.values,
-            labels={'x': 'Year', 'y': 'Number of Movies'},
-            markers=True
-        )
-        st.plotly_chart(fig_trend, use_container_width=True)
 
-    with col_right:
-        st.subheader("Average IMDB Score by Genre")
-        avg_score = analysis.get_avg_imdb_by_genre(filtered_df)
-        if not avg_score.empty:
-            fig_genre = px.bar(
-                x=avg_score.index, 
-                y=avg_score.values,
-                labels={'x': 'Genre', 'y': 'Avg IMDB Score'},
-                color=avg_score.values,
-                color_continuous_scale='Viridis'
+    with tab3:
+        col_left, col_right = st.columns(2)
+        
+        with col_left:
+            st.subheader("Average IMDB Score by Genre")
+            avg_score = analysis.get_avg_imdb_by_genre(filtered_df)
+            if not avg_score.empty:
+                fig_genre = px.bar(
+                    x=avg_score.index, 
+                    y=avg_score.values,
+                    labels={'x': 'Genre', 'y': 'Avg IMDB Score'},
+                    color=avg_score.values,
+                    color_continuous_scale='Viridis',
+                    template='plotly_dark'
+                )
+                fig_genre.update_yaxes(range=[0, 10])
+                st.plotly_chart(fig_genre, use_container_width=True)
+            else:
+                st.info("No data for genres.")
+
+        with col_right:
+            st.subheader("Budget vs. Gross Revenue")
+            fig_scatter = px.scatter(
+                filtered_df,
+                x='budget',
+                y='gross',
+                color='primary_genre',
+                hover_data=['movie_title', 'director_name', 'title_year'],
+                log_x=True, log_y=True,
+                labels={'budget': 'Budget (Log)', 'gross': 'Gross Revenue (Log)'},
+                template='plotly_dark'
             )
-            fig_genre.update_yaxes(range=[0, 10])
-            st.plotly_chart(fig_genre, use_container_width=True)
-        else:
-            st.info("No data for genres.")
-
-        st.subheader("Budget vs. Gross Revenue")
-        # Scatter plot
-        fig_scatter = px.scatter(
-            filtered_df,
-            x='budget',
-            y='gross',
-            color='primary_genre',
-            hover_data=['movie_title', 'director_name', 'title_year'],
-            log_x=True, log_y=True, # Log scale handles the huge range differences in movie money
-            labels={'budget': 'Budget (Log)', 'gross': 'Gross Revenue (Log)'}
-        )
-        st.plotly_chart(fig_scatter, use_container_width=True)
-
-    st.divider()
-    
-    st.subheader("Top Grossing Movies Data")
-    top_movies = analysis.get_top_grossing_movies(filtered_df, n=20)
-    st.dataframe(top_movies.set_index('movie_title'), use_container_width=True)
+            st.plotly_chart(fig_scatter, use_container_width=True)
 
 else:
     st.error("Data could not be loaded. Please ensure 'movie_metadata.csv' is in the project directory.")
