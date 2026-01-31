@@ -1,43 +1,139 @@
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+
+:root {
+    --primary-color: #00ADB5;
+    --secondary-color: #393E46;
+    --background-color: #0c0e12;
+    --card-bg: rgba(30, 36, 45, 0.7);
+    --text-color: #EEEEEE;
+    --accent-color: #222831;
+    --glass-border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+html,
+body,
+[class*="css"] {
+    font-family: 'Outfit', sans-serif;
+    color: var(--text-color);
+}
+
 /* Main Background */
 .stApp {
-    background-color: #0E1117;
-    color: #FAFAFA;
+    background: radial-gradient(circle at top left, #1a1f2e, #0c0e12);
+    /* background-color: var(--background-color); */
 }
 
 /* Sidebar */
 section[data-testid="stSidebar"] {
-    background-color: #262730;
-    color: #FAFAFA;
+    background-color: rgba(12, 14, 18, 0.95);
+    border-right: var(--glass-border);
 }
 
-/* Metrics Cards */
+div[data-testid="stSidebarNav"] {
+    border-bottom: var(--glass-border);
+    margin-bottom: 20px;
+}
+
+/* Custom Metric Cards */
 div[data-testid="metric-container"] {
-    background-color: #262730;
-    border: 1px solid #4C4C4C;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 2px 2px 10px rgba(0,0,0,0.5);
-    color: #FAFAFA;
+    background: var(--card-bg);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: var(--glass-border);
+    padding: 24px;
+    border-radius: 16px;
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-div[data-testid="metric-container"] > label {
-    color: #A6A6A6; /* Label Color */
-    font-size: 1rem;
+div[data-testid="metric-container"]:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 40px rgba(0, 173, 181, 0.2);
+    border: 1px solid rgba(0, 173, 181, 0.5);
 }
 
-div[data-testid="metric-container"] > div[data-testid="stMetricValue"] {
-    color: #21C354; /* Value Color (Greenish) */
-    font-size: 2rem;
+div[data-testid="metric-container"]>label {
+    color: #A0A5AA;
+    font-size: 0.9rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+div[data-testid="metric-container"]>div[data-testid="stMetricValue"] {
+    color: var(--primary-color);
+    font-size: 2.2rem;
+    font-weight: 700;
 }
 
 /* Headers */
-h1, h2, h3 {
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+h1,
+h2,
+h3 {
+    font-weight: 700;
+    color: #FFFFFF;
+    letter-spacing: -0.02em;
+}
+
+h1 {
+    font-size: 3rem;
+    background: -webkit-linear-gradient(0deg, #00ADB5, #EEEEEE);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* Tabs */
+.stTabs [data-baseweb="tab-list"] {
+    gap: 10px;
+    border-bottom: none;
+}
+
+.stTabs [data-baseweb="tab"] {
+    height: 50px;
+    white-space: pre-wrap;
+    background-color: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+    color: #A0A5AA;
     font-weight: 600;
-    color: #FAFAFA;
+    border: none;
+    padding: 0 20px;
+}
+
+.stTabs [aria-selected="true"] {
+    background-color: var(--primary-color) !important;
+    color: #FFFFFF !important;
 }
 
 /* Plotly Charts Background */
 .js-plotly-plot .plotly .main-svg {
-    background: rgba(0,0,0,0) !important;
+    background: rgba(0, 0, 0, 0) !important;
+}
+
+/* Expander */
+.streamlit-expanderHeader {
+    background-color: var(--card-bg);
+    border-radius: 10px;
+    font-weight: 600;
+}
+
+/* DataFrame */
+div[data-testid="stDataFrame"] {
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    padding: 10px;
+    border: var(--glass-border);
+}
+
+/* Widget Styles */
+div[data-baseweb="select"]>div {
+    background-color: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+    border-radius: 8px;
+}
+
+div[data-baseweb="tag"] {
+    background-color: rgba(0, 173, 181, 0.2);
 }
